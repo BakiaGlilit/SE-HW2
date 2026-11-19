@@ -1,0 +1,62 @@
+# Runs automatically on GitHub's servers after every push.
+# It compiles the project and runs the JUnit sanity tests that are in the test/ directory.
+# DO NOT CHANGE THIS FILE.
+
+name: Tests
+
+on:
+  push:
+  workflow_dispatch:   # also allows running by hand, from the "Actions" tab
+
+permissions:
+  contents: read
+
+env:
+  MAVEN_CENTRAL: https://repo1.maven.org/maven2
+  JUNIT_VERSION: 1.11.4
+  LWJGL_VERSION: 3.3.6
+
+jobs:
+  test:
+    name: Compile and run the sanity tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v6
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      # JUnit runs the tests. The game code needs the LWJGL library in order to compile
+      # (the tests themselves never open a window).
+      - name: Download libraries (JUnit, LWJGL)
+        run: |
+          mkdir -p lib
+          curl -fsSL --retry 3 -o lib/junit.jar \
+            "$MAVEN_CENTRAL/org/junit/platform/junit-platform-console-standalone/$JUNIT_VERSION/junit-platform-console-standalone-$JUNIT_VERSION.jar"
+          for module in lwjgl lwjgl-glfw lwjgl-opengl lwjgl-stb; do
+            curl -fsSL --retry 3 -o "lib/$module.jar" \
+              "$MAVEN_CENTRAL/org/lwjgl/$module/$LWJGL_VERSION/$module-$LWJGL_VERSION.jar"
+          done
+
+      - name: Compile
+        run: |
+          find src -name '*.java' > sources.txt
+          javac -encoding UTF-8 -cp "lib/*" -d out/main @sources.txt
+          find test -name '*.java' > test-sources.txt
+          javac -encoding UTF-8 -cp "out/main:lib/*" -d out/test @test-sources.txt
+
+      - name: Run tests
+        run: |
+          java -jar lib/junit.jar execute \
+            --class-path out/main:out/test \
+            --scan-class-path \
+            --fail-if-no-tests \
+            --disable-banner \
+            --details tree \
+            --details-theme ascii
