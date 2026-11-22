@@ -172,6 +172,19 @@ public String[] buildVocabularyIndex(String fileName) throws IOException {
                 writer.newLine();
             }
         }
+        try (BufferedWriter writer = new BufferedWriter(
+                new FileWriter(fileName + COUNTS_FILE_SUFFIX))) {
+
+            for (int i = 0; i < mBigramCounts.length; i++) {
+                for (int j = 0; j < mBigramCounts[i].length; j++) {
+
+                    if (mBigramCounts[i][j] != 0) {
+                        writer.write(i + "," + j + ":" + mBigramCounts[i][j]);
+                        writer.newLine();
+                    }
+                }
+            }
+        }
     }
 
     /*
