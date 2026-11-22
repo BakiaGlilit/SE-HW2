@@ -89,6 +89,12 @@ public class BigramModel {
 
             while ((line = reader.readLine()) != null) {
                 String[] tokens = line.trim().split("\\s+");
+                for (String token : tokens) {
+                    String word = normalizeWord(token);
+
+                    if (word != null && count < MAX_VOCABULARY_SIZE) {
+                        // Check whether this word already exists
+                    }
             }
         }
 
