@@ -1,7 +1,9 @@
 package il.ac.tau.cs.software1.bigram;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Locale;
 
@@ -158,8 +160,18 @@ public String[] buildVocabularyIndex(String fileName) throws IOException {
      * @pre: the method initModel was called (the language model is initialized)
      * @pre: fileName is a legal file path
      */
-    public void saveModel(String fileName) throws IOException { // Question 3
-        // TODO: implement
+    public void saveModel(String fileName) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(
+                new FileWriter(fileName + VOC_FILE_SUFFIX))) {
+
+            writer.write(mVocabulary.length + " words");
+            writer.newLine();
+
+            for (int i = 0; i < mVocabulary.length; i++) {
+                writer.write(i + "," + mVocabulary[i]);
+                writer.newLine();
+            }
+        }
     }
 
     /*
