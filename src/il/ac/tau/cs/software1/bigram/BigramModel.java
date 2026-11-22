@@ -126,8 +126,32 @@ public String[] buildVocabularyIndex(String fileName) throws IOException {
      * @post: mBigramCounts = prev(mBigramCounts)
      */
     public int[][] buildCountsArray(String fileName, String[] vocabulary) throws IOException { // Question 2
-        // TODO: implement
-        return null;
+        int[][] counts = new int[vocabulary.length][vocabulary.length];
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                int previousIndex = ELEMENT_NOT_FOUND;
+                String[] tokens = line.trim().split("\\s+");
+
+                for (String token : tokens) {
+                    String word = normalizeWord(token);
+                    int currentIndex = findIndex(vocabulary, word);
+
+                    if (currentIndex == ELEMENT_NOT_FOUND) {
+                        previousIndex = ELEMENT_NOT_FOUND;
+                        continue;
+                    }
+
+                    if (previousIndex != ELEMENT_NOT_FOUND) {
+                        counts[previousIndex][currentIndex]++;
+                    }
+                    previousIndex = currentIndex;
+                }
+            }
+        }
+
+        return counts;
     }
 
     /*
