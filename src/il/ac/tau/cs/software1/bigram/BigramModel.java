@@ -80,26 +80,46 @@ public class BigramModel {
      * @post: mVocabulary = prev(mVocabulary)
      * @post: mBigramCounts = prev(mBigramCounts)
      */
-    public String[] buildVocabularyIndex(String fileName) throws IOException { // Question 1
-        String[] vocabulary = new String[MAX_VOCABULARY_SIZE];
-        int count = 0;
+public String[] buildVocabularyIndex(String fileName) throws IOException {
+    String[] vocabulary = new String[MAX_VOCABULARY_SIZE];
+    int count = 0;
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
-            String line;
+    try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+        String line;
 
-            while ((line = reader.readLine()) != null) {
-                String[] tokens = line.trim().split("\\s+");
-                for (String token : tokens) {
-                    String word = normalizeWord(token);
+        while ((line = reader.readLine()) != null) {
+            String[] tokens = line.trim().split("\\s+");
 
-                    if (word != null && count < MAX_VOCABULARY_SIZE) {
-                        // Check whether this word already exists
+            for (String token : tokens) {
+                String word = normalizeWord(token);
+
+                if (word != null && count < MAX_VOCABULARY_SIZE) {
+                    boolean exists = false;
+
+                    for (int i = 0; i < count; i++) {
+                        if (vocabulary[i].equals(word)) {
+                            exists = true;
+                            break;
+                        }
                     }
+
+                    if (!exists) {
+                        vocabulary[count] = word;
+                        count++;
+                    }
+                }
             }
         }
-
-        return vocabulary;
     }
+
+    String[] result = new String[count];
+
+    for (int i = 0; i < count; i++) {
+        result[i] = vocabulary[i];
+    }
+
+    return result;
+}
 
     /*
      * @post: mVocabulary = prev(mVocabulary)
