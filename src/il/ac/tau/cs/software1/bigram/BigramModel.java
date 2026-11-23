@@ -191,6 +191,7 @@ public String[] buildVocabularyIndex(String fileName) throws IOException {
      * @pre: fileName is a legal file path
      */
     public void loadModel(String fileName) throws IOException {
+        // read the vocabulary file
         try (BufferedReader reader = new BufferedReader(
                 new FileReader(fileName + VOC_FILE_SUFFIX))) {
 
@@ -207,6 +208,27 @@ public String[] buildVocabularyIndex(String fileName) throws IOException {
                 String word = parts[1];
 
                 mVocabulary[index] = word;
+            }
+        }
+
+        // init counts array
+        int size = mVocabulary.length;
+        mBigramCounts = new int[size][size];
+
+        // read counts file
+        try (BufferedReader reader = new BufferedReader(
+                new FileReader(fileName + COUNTS_FILE_SUFFIX))) {
+
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split("[:,]");
+
+                int i = Integer.parseInt(parts[0]);
+                int j = Integer.parseInt(parts[1]);
+                int count = Integer.parseInt(parts[2]);
+
+                mBigramCounts[i][j] = count;
             }
         }
     }
