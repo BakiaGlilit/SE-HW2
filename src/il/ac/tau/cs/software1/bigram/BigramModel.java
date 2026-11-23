@@ -190,8 +190,25 @@ public String[] buildVocabularyIndex(String fileName) throws IOException {
     /*
      * @pre: fileName is a legal file path
      */
-    public void loadModel(String fileName) throws IOException { // Question 4
-        // TODO: implement
+    public void loadModel(String fileName) throws IOException {
+        try (BufferedReader reader = new BufferedReader(
+                new FileReader(fileName + VOC_FILE_SUFFIX))) {
+
+            String firstLine = reader.readLine();
+            int size = Integer.parseInt(firstLine.split(" ")[0]);
+
+            mVocabulary = new String[size];
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",", 2);
+
+                int index = Integer.parseInt(parts[0]);
+                String word = parts[1];
+
+                mVocabulary[index] = word;
+            }
+        }
     }
 
     /*
