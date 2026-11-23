@@ -240,8 +240,20 @@ public String[] buildVocabularyIndex(String fileName) throws IOException {
      * @post: if sentence is probable, according to the model, $ret = true, else, $ret = false
      */
     public boolean isLegalSentence(String sentence) { // Question 5
-        // TODO: implement
-        return false;
+        if (sentence.isEmpty()) {
+            return true;
+        }
+
+        String[] words = sentence.split(" ");
+        for (int i = 0; i < words.length; i++) {
+            if (getWordIndex(words[i]) == ELEMENT_NOT_FOUND) {
+                return false;
+            }
+            if (i > 0 && getBigramCount(words[i - 1], words[i]) == 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
     ///////////////////////////////////////////////////////////////////////////
